@@ -16,7 +16,7 @@ class TexasHoldemPlugin < Plugin
     "[<nick> | *] => show how much money you, <nick>, or everyone have left; " +
     "hem quit => end the game"
   end
-  
+
   def privmsg(m)
     if m.private?
       if m.params =~ /^(#\w+)\s+/
@@ -70,7 +70,7 @@ class TexasHoldemPlugin < Plugin
       return
     end
 
-    unless p = g.player[m.sourcenick]
+    unless curPlayer = g.player[m.sourcenick]
       m.reply 'You are not in the game in ' + channel
       return
     end
@@ -87,7 +87,7 @@ class TexasHoldemPlugin < Plugin
           @games.delete channel
           return
         when 'hand'
-          tellHand p
+          tellHand curPlayer
         when 'pot'
           m.reply "The current pot is: $#{g.pot}."
         when /^money(?:\s+(\S+))?$/
@@ -100,12 +100,12 @@ class TexasHoldemPlugin < Plugin
             end
             m.reply "#$1 has #{g.player[$1].money}."
           else
-            m.reply((m.private? ? 'You have' : p.nick + ' has') + 
-              " $#{p.money}.")
+            m.reply((m.private? ? 'You have' : curPlayer.nick + ' has') +
+              " $#{curPlayer.money}.")
           end
         when 'cards'
-          m.reply g.table.size > 0 ? 
-            "The cards on the table are: #{g.table.abbr}" : 
+          m.reply g.table.size > 0 ?
+            "The cards on the table are: #{g.table.abbr}" :
             'There are no cards on the table.'
         when /^(check|call|fold)$|^(raise|bet)\s+\$?(\d+)$/
           action = $1 || $2
@@ -129,7 +129,7 @@ class TexasHoldemPlugin < Plugin
 
           if g.winner
             str = if g.winner.is_a? Array
-              "#{g.winner.map{|p|p.nick}.join ' and '} share " +
+              "#{g.winner.map{|p| p.nick}.join ' and '} share " +
               "the pot of $#{g.pot}."
             else
               "#{g.winner.nick} wins the pot of $#{g.pot}."
@@ -138,7 +138,7 @@ class TexasHoldemPlugin < Plugin
             roundPlayers = g.playersLeft + g.losers
             if roundPlayers.size > 1
               m.reply str + '  Best hands were:'
-              for p in roundPlayers
+              roundPlayers.each do |p|
                 m.reply "#{p.nick}: #{p.bestHand.descr}: #{p.bestHand.abbr}"
               end
             else
@@ -186,7 +186,7 @@ class TexasHoldemPlugin < Plugin
     @bot.say channel, "New round:"
     @bot.say channel,
       "#{g.smallBlind.nick} is the small blind and puts in $#{g.blind/2}"
-    @bot.say channel, 
+    @bot.say channel,
       "#{g.bigBlind.nick} is the big blind and puts in $#{g.blind}"
 
     g.players.each {|p| tellHand p }

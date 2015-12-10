@@ -94,7 +94,7 @@ module TexasHoldEm
       straight = straightFlush = false
 
       # Straight & Straight Flush
-      for c in cards[0..(cards.size - 5)]
+      cards[0..(cards.size - 5)].each do |c|
         if str =~ Regexp.new(c.re + (1..4).map{|m| '%02d.' % (c.n - m)}.join)
           hand = $&
 
@@ -206,7 +206,7 @@ module TexasHoldEm
     private ###################################################################
 
     def findLosers
-      for p in @players.find_all {|p| p.stillIn && p.money < @blind }
+      @players.find_all {|p| p.stillIn && p.money < @blind }.each do |p|
         p.stillIn = false
         p.money   = 0
         @losers << p
@@ -405,7 +405,7 @@ module TexasHoldEm
       @lastAction = :deal
       @losers     = []
 
-      for p in @players.find_all {|p| p.money > 0 }
+      @players.find_all {|p| p.money > 0 }.each do |p|
         p.bet     = 0
         p.stillIn = true
         p.hasBet  = false
