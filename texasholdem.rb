@@ -30,7 +30,7 @@ module TexasHoldEm
 
     def name
       %w(Error Error Two Three Four Five Six Seven 
-	 Eight Nine Ten Jack Queen King Ace)[@n] + ' of ' + suitWord
+         Eight Nine Ten Jack Queen King Ace)[@n] + ' of ' + suitWord
     end
 
     def re
@@ -55,9 +55,9 @@ module TexasHoldEm
       super
 
       for suit in 1..4
-	for n in 2..14
-	  push Card.new(n, suit)
-	end
+        for n in 2..14
+          push Card.new(n, suit)
+        end
       end
     end
 
@@ -95,72 +95,72 @@ module TexasHoldEm
 
       # Straight & Straight Flush
       for c in cards[0..(cards.size - 5)]
-	if str =~ Regexp.new(c.re + (1..4).map{|m| '%02d.' % (c.n - m)}.join)
-	  hand = $&
+        if str =~ Regexp.new(c.re + (1..4).map{|m| '%02d.' % (c.n - m)}.join)
+          hand = $&
 
-	  if hand =~ /..(.)(..\1){4}/
-	    bestStr       = hand
-	    straightFlush = true
-	    break
-	  elsif !straight
-	    bestStr  = hand
-	    straight = true
-	  end
-	end
+          if hand =~ /..(.)(..\1){4}/
+            bestStr       = hand
+            straightFlush = true
+            break
+          elsif !straight
+            bestStr  = hand
+            straight = true
+          end
+        end
       end
 
       # Ace-Straight Special-Case: 14 -> 1
       if !straightFlush && str =~ /14.05.04.03.02./
-	hand = $&.sub(/^14(.)(.+)/, '\2' + '01\1') # 14 -> 01
-	if hand =~ /..(.)..\1..\1..\1..\1/
-	  bestStr       = hand
-	  straightFlush = true
-	elsif !straight
-	  bestStr       = hand
-	  straight      = true
-	end
+        hand = $&.sub(/^14(.)(.+)/, '\2' + '01\1') # 14 -> 01
+        if hand =~ /..(.)..\1..\1..\1..\1/
+          bestStr       = hand
+          straightFlush = true
+        elsif !straight
+          bestStr       = hand
+          straight      = true
+        end
       end
 
       ## ordered by best hand  --  there be dragons here
       if straightFlush
-	descr   = 'Straight Flush'
-	score   = 8000000 + bestStr[0,2].to_i
+        descr   = 'Straight Flush'
+        score   = 8000000 + bestStr[0,2].to_i
       elsif str =~ /(\d\d).(\1.){3}/
-	descr   = 'Four of a Kind'
-	kicker  = ($` + $')[0,3]
-	bestStr = $& + kicker
-	score   = 7000000 + scoreCards($1, kicker)
+        descr   = 'Four of a Kind'
+        kicker  = ($` + $')[0,3]
+        bestStr = $& + kicker
+        score   = 7000000 + scoreCards($1, kicker)
       elsif str =~ /((\d\d).\2.).*((\d\d).\4.\4.)|((\d\d).\6.\6.).*((\d\d).\8)/
-	descr   = 'Full House'
-	bestStr = $1 ? $1 + $3 : $5 + $7
-	score   = 6000000 + ($1 ? scoreCards($4, $2) : scoreCards($6, $8))
+        descr   = 'Full House'
+        bestStr = $1 ? $1 + $3 : $5 + $7
+        score   = 6000000 + ($1 ? scoreCards($4, $2) : scoreCards($6, $8))
       elsif str =~ /(\d\d(.)).*?(..\2).*?(..\2).*?(..\2).*?(..\2)/
-	descr   = 'Flush'
-	flush   = [ $1, $3, $4, $5, $6 ]
-	bestStr = flush.join
-	score   = 5000000 + scoreCards(flush)
+        descr   = 'Flush'
+        flush   = [ $1, $3, $4, $5, $6 ]
+        bestStr = flush.join
+        score   = 5000000 + scoreCards(flush)
       elsif straight
-	descr   = 'Straight'
-	score   = 4000000 + bestStr[0,2].to_i
+        descr   = 'Straight'
+        score   = 4000000 + bestStr[0,2].to_i
       elsif str =~ /(\d\d).\1.\1./
-	descr   = 'Three of a Kind'
-	kickers = ($` + $')[0,6]
-	bestStr = $& + kickers
-	score   = 3000000 + scoreCards($1, *kickers.split(/\D/))
+        descr   = 'Three of a Kind'
+        kickers = ($` + $')[0,6]
+        bestStr = $& + kickers
+        score   = 3000000 + scoreCards($1, *kickers.split(/\D/))
       elsif str =~ /((\d\d).\2.)(.*)((\d\d).\5.)/
-	descr   = 'Two Pair'
-	kicker  = ($` + ($3 || '') + $')[0,3]
-	bestStr = $1 + kicker + $4
-	score   = 2000000 + scoreCards($2, $5, kicker)
+        descr   = 'Two Pair'
+        kicker  = ($` + ($3 || '') + $')[0,3]
+        bestStr = $1 + kicker + $4
+        score   = 2000000 + scoreCards($2, $5, kicker)
       elsif str =~ /(\d\d).\1./
-	descr   = 'Pair'
-	kickers = ($` + $')[0,9]
-	bestStr = $& + kickers
-	score   = 1000000 + scoreCards($1, *kickers.split(/\D/))
+        descr   = 'Pair'
+        kickers = ($` + $')[0,9]
+        bestStr = $& + kickers
+        score   = 1000000 + scoreCards($1, *kickers.split(/\D/))
       else
-	descr   = 'High Card'
-	bestStr = str[0,15]
-	score   = scoreCards(bestStr.split(/\D/))
+        descr   = 'High Card'
+        bestStr = str[0,15]
+        score   = scoreCards(bestStr.split(/\D/))
       end
 
       re = Regexp.new(bestStr.gsub(/...(?=.)/, '\&|'))
@@ -184,7 +184,7 @@ module TexasHoldEm
 
   class Game
     attr_reader :players, :blind, :bettor, :pot, :bet, :smallBlind, :bigBlind,
-		:player, :winner, :table, :lastAction, :losers
+                :player, :winner, :table, :lastAction, :losers
 
     def initialize(nicks, startMoney)
       @blind       = 2
@@ -195,9 +195,9 @@ module TexasHoldEm
 
       # create players
       for nick in nicks
-	p = Player.new(nick, startMoney)
-	@players     << p
-	@player[nick] = p
+        p = Player.new(nick, startMoney)
+        @players     << p
+        @player[nick] = p
       end
 
       startHand
@@ -207,9 +207,9 @@ module TexasHoldEm
 
     def findLosers
       for p in @players.find_all {|p| p.stillIn && p.money < @blind }
-	p.stillIn = false
-	p.money   = 0
-	@losers << p
+        p.stillIn = false
+        p.money   = 0
+        @losers << p
       end
     end
 
@@ -237,12 +237,12 @@ module TexasHoldEm
 
     def makeBet(amount)
       raise RulesViolation,
-	"#{@bettor.nick} tried to bet $#{amount} when the bet is $#@bet" \
-	  if amount < (@bet - @bettor.bet)
+        "#{@bettor.nick} tried to bet $#{amount} when the bet is $#@bet" \
+          if amount < (@bet - @bettor.bet)
 
       raise RulesViolation,
-	"#{@bettor.nick} tried to bet $#{amount} when (s)he only has " +
-	"#{@bettor.money}" if amount > @bettor.money
+        "#{@bettor.nick} tried to bet $#{amount} when (s)he only has " +
+        "#{@bettor.money}" if amount > @bettor.money
 
       @bet  = amount
       @pot += amount
@@ -257,28 +257,28 @@ module TexasHoldEm
       # unless it's the first round and we're on the bigBlind's second betting
       # chance or there are people who still haven't called, the round's over
       unless @players.find {|p| p.stillIn && (p.bet < @bet || !p.hasBet) }
-	case @table.size
-	  when 0  # pre-flop
-	    dealFlop
-	  when 3  # flop
-	    dealTurn
-	  when 4  # turn
-	    dealRiver
-	  when 5
-	    playersLeft.each {|p| p.findBestHand @table }
-	    hiScore = playersLeft.map {|p| p.bestHand.score}.max
-	    winners = playersLeft.find_all {|p| p.bestHand.score == hiScore }
+        case @table.size
+          when 0  # pre-flop
+            dealFlop
+          when 3  # flop
+            dealTurn
+          when 4  # turn
+            dealRiver
+          when 5
+            playersLeft.each {|p| p.findBestHand @table }
+            hiScore = playersLeft.map {|p| p.bestHand.score}.max
+            winners = playersLeft.find_all {|p| p.bestHand.score == hiScore }
 
-	    if winners.size > 1
-	      tieHand winners
-	    else
-	      winHand winners[0]
-	    end
-	  else
-	    raise "There are #{@table.size} cards on the table!?"
-	end
+            if winners.size > 1
+              tieHand winners
+            else
+              winHand winners[0]
+            end
+          else
+            raise "There are #{@table.size} cards on the table!?"
+        end
 
-	return
+        return
       end
 
       @lastAction = nil
@@ -286,7 +286,7 @@ module TexasHoldEm
 
     def nextBettor
       begin
-	@bettorIndex += 1
+        @bettorIndex += 1
       end until (@bettor = @players[@bettorIndex % @players.size]).stillIn
       @bettor
     end
@@ -317,8 +317,8 @@ module TexasHoldEm
       @losers = []
 
       for p in @players
-	p.bet    = 0
-	p.hasBet = false
+        p.bet    = 0
+        p.hasBet = false
       end
 
       @bettorIndex = @dealerIndex
@@ -338,8 +338,8 @@ module TexasHoldEm
 
     def newBet(amount)
       raise RulesViolation,
-	"there is already a bet of #@bet on the table; did you mean raise?" \
-	  if @bet > 0
+        "there is already a bet of #@bet on the table; did you mean raise?" \
+          if @bet > 0
 
       @raises -= 1
 
@@ -358,15 +358,15 @@ module TexasHoldEm
       @raises += 1
 
       raise RulesViolation, "maximum number of raises (#@maxRaises) exceeded" \
-	if @raises > @maxRaises
+        if @raises > @maxRaises
 
       raise RulesViolation, "minimum bet/raise is $#@blind" if amount < @blind
 
       min = playersLeft.min {|a,b| a.money <=> b.money }
 
       raise RulesViolation, 
-	"maximum bet is #{min.nick}'s remaining money: $#{min.money}" \
-	  if amount > min.money
+        "maximum bet is #{min.nick}'s remaining money: $#{min.money}" \
+          if amount > min.money
 
       makeBet @bet + amount
     end
@@ -375,9 +375,9 @@ module TexasHoldEm
       @bettor.stillIn = false
 
       if playersLeft.size == 1
-	winHand playersLeft[0]
+        winHand playersLeft[0]
       else
-	nextBettor
+        nextBettor
       end
 
       @lastAction = nil
@@ -385,9 +385,9 @@ module TexasHoldEm
 
     def choices
       if @bet == @bettor.bet
-	choices = ['check']
+        choices = ['check']
       else
-	choices = ['fold', 'call']
+        choices = ['fold', 'call']
       end
       choices += [@bet > 0 ? 'raise' : 'bet'] if @raises < @maxRaises
 
@@ -406,9 +406,9 @@ module TexasHoldEm
       @losers     = []
 
       for p in @players.find_all {|p| p.money > 0 }
-	p.bet     = 0
-	p.stillIn = true
-	p.hasBet  = false
+        p.bet     = 0
+        p.stillIn = true
+        p.hasBet  = false
       end
 
       # rotate the dealer
@@ -421,12 +421,12 @@ module TexasHoldEm
       makeBet @blind / 2    ## calls nextBettor
 
       @bigBlind = @bettor
-      makeBet @blind	    ## calls nextBettor
+      makeBet @blind            ## calls nextBettor
       @bigBlind.hasBet = false
 
       # deal the cards
       @players.each {|p| 
-	p.hand = Hand.new([ @deck.draw, @deck.draw ]) if p.stillIn 
+        p.hand = Hand.new([ @deck.draw, @deck.draw ]) if p.stillIn 
       }
     end
   end
