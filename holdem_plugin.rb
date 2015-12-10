@@ -13,7 +13,7 @@ class TexasHoldemPlugin < Plugin
     "do that; hem bet <amount> => make a bet in later rounds of betting; " +
     "hem pot => give the current value of the pot; hem hand => " +
     "show current hand; hem cards => show current table cards; hem money " +
-    "[<nick> | *] => show how much money you, <nick>, or everyone have left; " +
+    "[<nick> | *] => show how much money you, <nick>, or everyone have left; "+
     "hem quit => end the game"
   end
 
@@ -40,6 +40,11 @@ class TexasHoldemPlugin < Plugin
 
     cmd.strip!
 
+    if cmd =~ /^help\b/
+      m.reply help(self)
+      return
+    end
+
     if cmd =~ /^play\s+(\d+)\s+(.+)/
       if @games[channel]
         m.reply "there is already a game in progress in #{channel}"
@@ -63,7 +68,6 @@ class TexasHoldemPlugin < Plugin
 
       return
     end
-
 
     unless g = @games[channel]
       m.reply 'There is no game in progress yet, use "play" to start one.'
