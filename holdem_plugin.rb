@@ -146,6 +146,7 @@ class TexasHoldemPlugin < Plugin
 
 	    if g.gameOver?
 	      m.reply "#{g.winner.nick} has won the game!"
+              @games.delete channel
 	      return
 	    end
 
