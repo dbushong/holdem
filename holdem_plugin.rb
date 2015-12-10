@@ -135,11 +135,12 @@ class TexasHoldemPlugin < Plugin
 	      "#{g.winner.nick} wins the pot of $#{g.pot}."
 	    end
 
-	    if g.playersLeft.size > 1
+	    roundPlayers = g.playersLeft + g.losers
+	    if roundPlayers.size > 1
 	      m.reply str + '  Best hands were:'
-	      g.playersLeft.each {|p| 
-		m.reply "#{p.nick}: #{p.bestHand.descr}: #{p.bestHand.abbr}" 
-	      }
+	      for p in roundPlayers
+		m.reply "#{p.nick}: #{p.bestHand.descr}: #{p.bestHand.abbr}"
+	      end
 	    else
 	      m.reply str
 	    end
