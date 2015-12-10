@@ -1,4 +1,4 @@
-require 'texasholdem'
+require './texasholdem'
 
 class TexasHoldemPlugin < Plugin
   def initialize

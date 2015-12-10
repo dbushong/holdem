@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+
+prog = File.basename($0)
+opts = OptionParser.new
+opts.banner = "usage: #{prog} [options]"
+opts.on_tail('-h', '--help', 'Show this message') { puts opts ; exit 1 }
+begin
+  opts.parse!(ARGV)
+rescue OptionParser::ParseError => e
+  $stderr.puts "#{prog}: #{e}\n#{opts}"
+  exit 1
+end
+
+require './mock_rbot'
+Plugin.set_nicks ARGV
+require './holdem_plugin'
+Plugin.mock
